@@ -51,7 +51,7 @@ class Game:
         if hours >= 12:
             time_frame = "PM"
         if hours == 0:
-            hours = 12
+            hours = 12 
         elif hours > 12:
             hours -= 12
         return f"{hours}:{minutes:02d} {time_frame}"
@@ -91,6 +91,8 @@ class Game:
         kitchen.add_option("Make tea", "afternoon")
         kitchen.add_option("Cook dinner", "evening")
         kitchen.add_option("Grab a snack", "night")
+        kitchen.add_option("Grab a snack", "morning")
+        kitchen.add_option("Grab a snack", "afternoon")
 
     def display_current_location(self):
         self.current_location.display()
