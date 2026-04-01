@@ -78,6 +78,8 @@ class Game:
         self.locations["kitchen"] = kitchen
 
     def setup_options(self):
+       #location_name = self.locations["location_name"]
+       #location_name.add_option("option text", "time_period")
         bedroom = self.locations["bedroom"]
         bedroom.add_option("Get up and start your day", "morning")
         bedroom.add_option("Scroll through your phone", "morning")
@@ -93,6 +95,7 @@ class Game:
         kitchen.add_option("Grab a snack", "night")
         kitchen.add_option("Grab a snack", "morning")
         kitchen.add_option("Grab a snack", "afternoon")
+
 
     def display_current_location(self):
         self.current_location.display()
