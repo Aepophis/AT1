@@ -1,107 +1,117 @@
-
-
 class Location:
-    #Represents a location in the game world
+    # Represents a location in the game world
     def __init__(self, name, description):
         self.name = name
         self.description = description
-        self.connections = {}  # Dictionary for N/S/E/W connections
-    
+        self.connections = {}
+        self.options = {}
+
     def display(self):
-        #Print the location name and description#
         print(f"\n=== {self.name} ===")
         print(self.description)
-    
-    def set_connection(self, direction, location):
-        #Set a connection to another location#
 
-        
+    def set_connection(self, direction, location):
         self.connections[direction.upper()] = location
+
+    def add_option(self, text, period="all"):
+        if period not in self.options:
+            self.options[period] = []
+        self.options[period].append(text)
+
+    def get_options(self, period):
+        result = []
+        if "all" in self.options:
+            result.extend(self.options["all"])
+        if period in self.options:
+            result.extend(self.options[period])
+        return result
+
+    def display_options(self, period):
+        options = self.get_options(period)
+        if not options:
+            print("No options are available right now.")
+            return
+        for number, text in enumerate(options, 1):
+            print(f"{number}. {text}")
 
 
 class Game:
-    #Main game class that manages the adventure game#
-    
+    # Main game class that manages the adventure game
     def __init__(self):
-        # Initialize game state variables
         self.current_location = None
-        self.health_score = 100  # Track overall health (0-100)
-        self.energy_level = 100  # Track energy (0-100)
-        self.stress_level = 0    # Track stress (0-100)
-        self.tiredness = 0       # Track cumulative tiredness (0-100)
-        self.sleep_hours = 8     # Start with proper sleep
-        self.rest_deficit = 0    # Track cumulative rest deficit
-        self.game_over = False
-        self.current_day = 0     # Track which day of the week
-        self.total_sleep_week = 8  # Track total sleep for the week
-        self.day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        self.Location = {}
+        self.current_time = 600
+        self.locations = {}
         self.create_locations()
-        self.choices = {}  # Track choices made for each location
-        # Time tracking (0-6 representing times of day)
-        self.current_time = 0
-        self.location_times_available = {}  # Track when locations are available
-        # Track which actions have been used at each location today
-        self.location_actions_used = {} 
-        self.skipped_lunch = False
-        self.ate_lunch = False
-    
-    def __str__(self, current_time):
-        # Return a string representation of the current game time
-        hours = current_time // 100
-        minutes = current_time % 100
-        if hours >= 12:
-            hours -= 12 
-        if hours == 0:
-            hours = 12
-        if hours >= 12:
-            return f"Current time is{hours:2d}:{minutes:02d} PM"
-        else:
-            return f"Current time is{hours:2d}:{minutes:02d} AM"
+        self.setup_options()
 
+    def format_time(self):
+        hours = self.current_time // 100
+        minutes = self.current_time % 100
+        time_frame = "AM"
+        if hours >= 12:
+            time_frame = "PM"
+        if hours == 0:
+            hours = 12 
+        elif hours > 12:
+            hours -= 12
+        return f"{hours}:{minutes:02d} {time_frame}"
+
+    def time_period(self):
+        if 600 <= self.current_time < 1200:
+            return "morning"
+        if 1200 <= self.current_time < 1700:
+            return "afternoon"
+        if 1700 <= self.current_time < 2100:
+            return "evening"
+        return "night"
 
     def create_locations(self):
-        # Create location objects
-        Bedroom = Location(
-            "Your Bedroom",
-            "You wake up after a night's sleep. Your room contains your bed, desk, and window.\n"
-            "You need to decide how to start your day."
+        bedroom = Location(
+            "Bedroom",
+            "Your room has a bed, a desk, and a window.\nYou can choose how to start the day."
         )
-        Kitchen = Location(
+        kitchen = Location(
             "Kitchen",
-            "The kitchen is where you can prepare meals. It has a fridge, stove, and dining table.\n"
-            "You can choose to eat breakfast here or skip it."
+            "The kitchen has a fridge and a stove.\nYou can prepare food or take a break here."
         )
-    
-    def locational_choices(self):
-        self.Location["bedroom"].location_choices = ["A", "B", "C"]
-        self.Location["kitchen"].location_choices = ["A", "B", "C"]
+        self.locations["bedroom"] = bedroom
+        self.locations["kitchen"] = kitchen
 
-    def create_location_choices(self):
-        
+    def setup_options(self):
+       #location_name = self.locations["location_name"]
+       #location_name.add_option("option text", "time_period")
+        bedroom = self.locations["bedroom"]
+        bedroom.add_option("Get up and start your day", "morning")
+        bedroom.add_option("Scroll through your phone", "morning")
+        bedroom.add_option("Lie down for a while", "afternoon")
+        bedroom.add_option("Go back to sleep", "morning")
+        bedroom.add_option("Go tosleep", "night")
 
-        self.Location["bedroom"] = Bedroom
-        self.Location["kitchen"] = Kitchen 
+        kitchen = self.locations["kitchen"]
+        kitchen.add_option("Eat a healthy breakfast", "morning")
+        kitchen.add_option("Skip breakfast", "morning")
+        kitchen.add_option("Make tea", "afternoon")
+        kitchen.add_option("Cook dinner", "evening")
+        kitchen.add_option("Grab a snack", "night")
+        kitchen.add_option("Grab a snack", "morning")
+        kitchen.add_option("Grab a snack", "afternoon")
 
 
+    def display_current_location(self):
+        self.current_location.display()
+        print("Time:", self.format_time())
+        print("Options:")
+        self.current_location.display_options(self.time_period())
 
     def start_game(self):
-        # Start the game by setting the initial location and displaying it
-        self.current_location = self.Location["bedroom"]
-        self.current_time = 600 # Start at 6:00 AM
-        self.current_location.display()
-        print(self.__str__(self.current_time))
-        self.choices[self.current_location.name] = []  # Initialize choices for the bedroom
-
-
-
+        self.current_location = self.locations["bedroom"]
+        self.current_time = 600
+        self.display_current_location()
 
     def run(self):
-        #Run the complete game
         self.start_game()
 
 
-# Main program - Run the game
 if __name__ == "__main__":
     game = Game()
     game.run()
