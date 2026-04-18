@@ -33,32 +33,56 @@ class Game:
     def create_locations(self):
         bedroom = Location(
             "Your Bedroom",
-            "You wake up and receive a suspicious message offering a prize."
+            "You wake up and receive a suspicious message offering a prize.",
+            alternative_descriptions=[
+                "You return to your bedroom. The suspicious message is still on your phone.",
+                "Your bedroom feels familiar. You remember the warning about the scam message."
+            ]
         )
 
         street = Location(
             "Outside Your House",
-            "You step outside and consider your next move."
+            "You step outside and consider your next move.",
+            alternative_descriptions=[
+                "You stand outside your house again. The neighborhood is quiet.",
+                "You return to the street. The fresh air helps you think clearly."
+            ]
         )
 
         school = Location(
             "School",
-            "Your teacher is discussing cyber safety."
+            "Your teacher is discussing cyber safety.",
+            alternative_descriptions=[
+                "You return to school. Classes are in session.",
+                "The school hallway is busy with students. Your teacher waves at you."
+            ]
         )
 
         computer_lab = Location(
             "Computer Lab",
-            "You access a computer to verify the message."
+            "You access a computer to verify the message.",
+            alternative_descriptions=[
+                "The computer lab is quiet. You can continue your research here.",
+                "You return to the computer lab. The screens glow softly in the dim light."
+            ]
         )
 
         scam_site = Location(
             "Suspicious Website",
-            "The website asks for personal details."
+            "The website asks for personal details.",
+            alternative_descriptions=[
+                "The suspicious website is still open. Red flags are everywhere.",
+                "You return to the scam site. It looks even more fake now that you know what to look for."
+            ]
         )
 
         secure_site = Location(
             "Official Website",
-            "You verify the offer on a legitimate website."
+            "You verify the offer on a legitimate website.",
+            alternative_descriptions=[
+                "The official website confirms the offer is a scam. Good thing you checked!",
+                "You return to the secure site. The warning about the scam is still displayed."
+            ]
         )
 
         self.locations = {
@@ -140,6 +164,15 @@ class Game:
             if next_location:
                 return next_location
 
+            # Check if player tried a direction that doesn't exist
+            if command in ["north", "south", "east", "west"]:
+                print("\nYou stumble in that direction and hit a wall!")
+                print("Everything goes black as you fall unconscious...")
+                print("\nYou wake up in your bedroom, dazed and confused.")
+                self.current_location = self.locations["bedroom"]
+                self.current_location.visit()
+                return self.current_location
+
             option = self.current_location.get_option(command)
             if option:
                 result = option.execute()
@@ -147,7 +180,7 @@ class Game:
                     return result
                 return self.current_location
 
-            print("Invalid command. Try north, south, east, west, or an action.")
+            print("Invalid command. Try an available direction or action.")
 
     def play(self):
         print("CYBER SAFETY: INTERACTIVE ADVENTURE")
@@ -157,5 +190,9 @@ class Game:
             self.current_location.display()
             next_location = self.get_player_input()
 
+            if not self.is_running:
+                break
+
             if isinstance(next_location, Location):
                 self.current_location = next_location
+                self.current_location.visit()
