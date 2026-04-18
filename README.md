@@ -10,5 +10,6 @@ Features
 - Multiple decision points and endings
 - Educational content
 
-How to Run
+How to Run:
+
 Press the "Run Python File" while in the "main.py" file
