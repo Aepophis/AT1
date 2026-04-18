@@ -11,11 +11,24 @@ class Game:
 
     def safe_ending(self):
         print("\nCongratulations! You avoided the scam.")
-        self.is_running = False
+        self.show_end_menu()
 
     def scam_ending(self):
         print("\nYou fell for a scam. Always verify online information.")
-        self.is_running = False
+        self.show_end_menu()
+
+    def show_end_menu(self):
+        while True:
+            choice = input("\nWould you like to (1) Play Again or (2) Quit? Enter 1 or 2: ").strip()
+            if choice == "1":
+                self.__init__()  # Reset the game
+                self.play()
+            elif choice == "2":
+                self.is_running = False
+                print("Thanks for playing!")
+                break
+            else:
+                print("Invalid choice. Please enter 1 or 2.")
 
     def create_locations(self):
         bedroom = Location(
@@ -70,22 +83,48 @@ class Game:
 
         # Options
         bedroom.add_option("check", Option(
-            "Check the suspicious message.", scam_site))
+            "Check the suspicious message.", scam_site,
+            outcome="You click on the link and are taken to a website that looks almost official..."))
+        bedroom.add_option("ignore", Option(
+            "Ignore the message and go to school.", school,
+            outcome="You wisely decide to ignore the message and head to school."))
 
         school.add_option("listen", Option(
-            "Listen to the cyber safety lesson.", computer_lab))
+            "Listen to the cyber safety lesson.", computer_lab,
+            outcome="Your teacher teaches you how to identify phishing scams and verify offers online."))
+        school.add_option("ask", Option(
+            "Ask your teacher about the message.", computer_lab,
+            outcome="Your teacher warns you about the scam and shows you how to verify offers safely."))
 
         computer_lab.add_option("verify", Option(
-            "Verify the message securely.", secure_site))
+            "Verify the message securely.", secure_site,
+            outcome="You search for the official website and find that the offer is a scam!"))
+        computer_lab.add_option("search", Option(
+            "Search for information about the offer.", computer_lab,
+            outcome="You search online and find several warning articles about this exact scam."))
+        computer_lab.add_option("back", Option(
+            "Go back to school.", school,
+            outcome="You return to school to learn more from your teacher."))
 
         scam_site.add_option("enter", Option(
-            "Enter personal details.", action=self.scam_ending))
-
+            "Enter personal details.", action=self.scam_ending,
+            outcome="You enter your personal information and submit..."))
         scam_site.add_option("leave", Option(
-            "Leave the suspicious website.", bedroom))
+            "Leave the suspicious website.", bedroom,
+            outcome="Something doesn't feel right. You close the website and leave."))
+        scam_site.add_option("warning", Option(
+            "Read the warning signs on this site.", scam_site,
+            outcome="You notice poor grammar, suspicious links, and urgent language - all red flags!"))
 
         secure_site.add_option("report", Option(
-            "Report the scam.", action=self.safe_ending))
+            "Report the scam.", action=self.safe_ending,
+            outcome="You report the scam to the authorities and cybercriminals are caught!"))
+        secure_site.add_option("read", Option(
+            "Read more information about this offer.", secure_site,
+            outcome="The official website shows the offer is legitimate and warns about the fake version."))
+        secure_site.add_option("back", Option(
+            "Go back to the computer lab.", computer_lab,
+            outcome="You return to the computer lab to do more research."))
 
         self.current_location = bedroom
 
@@ -112,7 +151,7 @@ class Game:
 
     def play(self):
         print("CYBER SAFETY: INTERACTIVE ADVENTURE")
-        print("Type north, south, east, or west to move.")
+        print("Type north, south, east, west to move, or an action name.")
 
         while self.is_running:
             self.current_location.display()
